@@ -11,7 +11,7 @@ export const buildCommonCommandInput = ({
   filename: string;
 }) => ({
   /* eslint-disable @typescript-eslint/naming-convention */
-  Bucket: bucket,
+  Bucket: bucket || "",
   Key: `${prefix}${filename}`,
   /* eslint-enable @typescript-eslint/naming-convention */
 });

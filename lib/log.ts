@@ -1,4 +1,5 @@
 import { green, grey, red, yellow } from "chalk";
+import path from "path";
 import { RemoteCacheImplementation } from "./types/remote-cache-implementation";
 
 const DELIMITER_LENGTH = 78;
@@ -42,7 +43,7 @@ export const storeSuccess = (
   log(
     formatSection(
       `Stored output to remote cache: ${green(name)}`,
-      `File: ${file}`
+      `File: ${path.basename(file)}`
     )
   );
 

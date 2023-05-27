@@ -1,4 +1,5 @@
-import defaultTasksRunner from "@nx/workspace/tasks-runners/default";
+
+import defaultTasksRunner from "@nrwl/workspace/tasks-runners/default";
 import { S3Options } from "./runner-implementation";
 import runnerSetup from "./runner-implementation";
 import { createCustomRunner } from "./create-custom-runner";

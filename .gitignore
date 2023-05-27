@@ -3,3 +3,4 @@ index.js
 *.tgz
 .verdaccio-db.json
 dist
+.vscode

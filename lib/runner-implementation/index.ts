@@ -26,8 +26,8 @@ export default async (options: CustomRunnerOptions<S3Options>) => {
 
   const s3Storage = buildS3Client(options);
 
-  const bucket = process.env.ENV_BUCKET ?? options.bucket;
-  const prefix = process.env.ENV_PREFIX ?? options.prefix ?? "";
+  const bucket = process.env[ENV_BUCKET] ?? options.bucket;
+  const prefix = process.env[ENV_PREFIX] ?? options.prefix ?? "";
   const readOnly = isReadOnly(options, ENV_READ_ONLY);
 
   const config: RemoteCacheImplementation = {

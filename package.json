@@ -1,7 +1,7 @@
 {
-  "name": "nx-remotecache-custom",
-  "version": "4.0.0",
-  "description": "Build custom caching for @nrwl/nx in a few lines of code",
+  "name": "@hytromo/nx-s3-cache",
+  "version": "1.0.0",
+  "description": "Nx s3 cache using GNU tar",
   "main": "index.js",
   "typings": "index.d.ts",
   "scripts": {

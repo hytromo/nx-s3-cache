@@ -22,7 +22,7 @@
     "angular",
     "typescript"
   ],
-  "author": "Niklas Portmann",
+  "author": "Alexandros Solanos",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/hytromo/nx-s3-cache/issues"

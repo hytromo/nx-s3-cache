@@ -1,10 +1,11 @@
-import { Upload } from "@aws-sdk/lib-storage";
 import fs from "fs";
 import path from "path";
 import { initEnv } from "../init-env";
-import { buildS3Client } from "./s3-client";
 import { CustomRunnerOptions } from "../types/custom-runner-options";
 import { RemoteCacheImplementation } from "../types/remote-cache-implementation";
+import { downloadFromS3 } from "./download";
+import { buildS3Client } from "./s3-client";
+import { uploadToS3 } from "./upload";
 import { buildCommonCommandInput, isReadOnly } from "./util";
 
 export interface S3Options {
@@ -24,7 +25,7 @@ const ENV_READ_ONLY = "NXCACHE_S3_READ_ONLY";
 export default async (options: CustomRunnerOptions<S3Options>) => {
   initEnv(options);
 
-  const s3Storage = buildS3Client(options);
+  const s3Client = buildS3Client(options);
 
   const bucket = process.env[ENV_BUCKET] ?? options.bucket;
   const prefix = process.env[ENV_PREFIX] ?? options.prefix ?? "";
@@ -34,7 +35,7 @@ export default async (options: CustomRunnerOptions<S3Options>) => {
     name: "S3",
     fileExists: async (filename: string) => {
       try {
-        const result = await s3Storage.headObject(
+        const result = await s3Client.headObject(
           buildCommonCommandInput({ bucket, prefix, filename })
         );
         return !!result;
@@ -50,22 +51,16 @@ export default async (options: CustomRunnerOptions<S3Options>) => {
       }
     },
     retrieveFile: async (filename: string) => {
-      const result = await s3Storage.getObject(
-        buildCommonCommandInput({ bucket, prefix, filename })
-      );
-      if (!result.Body) {
-        throw new Error("No body");
-      }
-
-      const bodyArrayBody = await result.Body.transformToByteArray();
       const tmpFile = path.join(
         fs.mkdtempSync("/tmp/nx-cache-"),
         path.basename(filename)
       );
 
-      await new Promise<void>((res, rej) =>
-        fs.writeFile(tmpFile, bodyArrayBody, (err) => (err ? rej(err) : res()))
-      );
+      await downloadFromS3({
+        ...buildCommonCommandInput({ bucket, prefix, filename }),
+        s3Client,
+        savePath: tmpFile,
+      });
 
       return tmpFile;
     },
@@ -74,20 +69,13 @@ export default async (options: CustomRunnerOptions<S3Options>) => {
         throw new Error("ReadOnly storage, cannot store file");
       }
 
-      const fileContent = await new Promise<Buffer>((res, rej) => {
-        fs.readFile(filename, (err, data) => (err ? rej(err) : res(data)));
+      const result = await uploadToS3({
+        ...buildCommonCommandInput({ bucket, prefix, filename }),
+        s3Client,
+        filePath: filename,
       });
 
-      const upload = new Upload({
-        client: s3Storage,
-        params: {
-          ...buildCommonCommandInput({ bucket, prefix, filename }),
-          // eslint-disable-next-line @typescript-eslint/naming-convention
-          Body: fileContent,
-        },
-      });
-
-      return upload.done();
+      return result;
     },
   };
 

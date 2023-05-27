@@ -1,14 +1,14 @@
 {
   "name": "@hytromo/nx-s3-cache",
-  "version": "1.0.0",
-  "description": "Nx s3 cache using GNU tar",
-  "main": "index.js",
-  "typings": "index.d.ts",
+  "version": "0.0.1",
+  "description": "Nx s3 cache using GNU tar and multipart s3 uploads/downloads",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "scripts": {
-    "build": "rm -rf dist && tsc && cp package.json dist/package.json && cp README.md dist/README.md && cp CHANGELOG.md dist/CHANGELOG.md",
-    "release": "pnpm build && cd dist && pnpm publish && cd ..",
-    "local-release": "pnpm build && cd dist && pnpm publish --registry=http://localhost:4873/ && cd ..",
-    "link": "pnpm build && cd dist && pnpm link && cd .."
+    "build": "rm -rf dist && tsc && cp package.json dist/package.json && cp README.md dist/README.md && cp CHANGELOG.md dist/CHANGELOG.md"
   },
   "repository": {
     "type": "git",

@@ -10,10 +10,25 @@ const log = console.log;
 const formatSection = (...content: string[]) =>
   grey([DELIMITER, ...content, DELIMITER].join("\n"));
 
+const getTimings = (timings: Record<string, number>) =>
+  `(total:${Object.entries(timings).reduce(
+    (p, c) => p + c[1],
+    0
+  )}ms/${Object.entries(timings)
+    .map(([k, v]) => `${k}:${v}ms`)
+    .join("/")})`;
+
 export const retrieveSuccess = (
   { name }: RemoteCacheImplementation,
-  file: string
-) => log(formatSection(`Remote cache hit: ${green(name)}`, `File: ${file}`));
+  file: string,
+  timings: Record<string, number> = {}
+) =>
+  log(
+    formatSection(
+      `Remote cache hit: ${green(name)} ${getTimings(timings)}`,
+      `File: ${file}`
+    )
+  );
 
 export const retrieveFailure = (
   { name }: RemoteCacheImplementation,
@@ -38,11 +53,12 @@ export const setupFailure = (error?: any) =>
 
 export const storeSuccess = (
   { name }: RemoteCacheImplementation,
-  file: string
+  file: string,
+  timings: Record<string, number> = {}
 ) =>
   log(
     formatSection(
-      `Stored output to remote cache: ${green(name)}`,
+      `Stored to remote cache: ${green(name)} ${getTimings(timings)}`,
       `File: ${path.basename(file)}`
     )
   );

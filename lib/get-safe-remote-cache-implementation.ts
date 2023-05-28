@@ -1,18 +1,20 @@
 import * as log from "./log";
 import { CustomRunnerOptions } from "./types/custom-runner-options";
 import { RemoteCacheImplementation } from "./types/remote-cache-implementation";
-import { SafeRemoteCacheImplementation } from "./types/safe-remote-cache-implementation";
 
 const attachLogsToFileOperation =
-  <T, OtherArgs extends unknown[]>({
+  <
+    T extends { timings?: Record<string, number> },
+    OtherArgs extends unknown[]
+  >({
     operation,
     success,
     failure,
     verbose,
     silent,
   }: {
-    operation: (filename: string, ...args: OtherArgs) => Promise<T>;
-    success?: (filename: string) => void;
+    operation: (filename: string, ...args: OtherArgs) => Promise<T | null>;
+    success?: (filename: string, timings?: Record<string, number>) => void;
     failure: (filename: string, error: unknown) => void;
     verbose: boolean;
     silent: boolean;
@@ -22,7 +24,7 @@ const attachLogsToFileOperation =
       const result = await operation(filename, ...args);
 
       if (!silent) {
-        success?.(filename);
+        success?.(filename, result?.timings);
       }
 
       return result;
@@ -40,7 +42,7 @@ const attachLogsToFileOperation =
 export const getSafeRemoteCacheImplementation = async (
   implementationPromise: Promise<RemoteCacheImplementation>,
   options: CustomRunnerOptions
-): Promise<SafeRemoteCacheImplementation | null> => {
+): Promise<RemoteCacheImplementation | null> => {
   const verbose = !!options.verbose;
   const silent = !!options.silent;
 
@@ -54,7 +56,8 @@ export const getSafeRemoteCacheImplementation = async (
       name,
       retrieveFile: attachLogsToFileOperation({
         operation: retrieveFile,
-        success: (filename) => log.retrieveSuccess(implementation, filename),
+        success: (filename, timings) =>
+          log.retrieveSuccess(implementation, filename, timings),
         failure: (filename, error) =>
           log.retrieveFailure(implementation, filename, error),
         verbose,
@@ -62,7 +65,8 @@ export const getSafeRemoteCacheImplementation = async (
       }),
       storeFile: attachLogsToFileOperation({
         operation: storeFile,
-        success: (filename) => log.storeSuccess(implementation, filename),
+        success: (filename, timings) =>
+          log.storeSuccess(implementation, filename, timings),
         failure: (filename, error) =>
           log.storeFailure(implementation, filename, error),
         verbose,

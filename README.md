@@ -2,7 +2,7 @@
 
 ## Why?
 
-All the popular nx cache libraries, including the Nx Cloud's one, seem to be using the npm tar package to tar/untar archives using Node.js. While this increases portability, I came to realize that this can be 12x slower than using system calls to GNU tar, and performance can be massively be improved by compressing using `pigz` - a multithreaded `gzip` alternative.
+All the popular nx cache libraries, including the Nx Cloud's one, [seem](https://www.npmjs.com/package/@nx-aws-plugin/nx-aws-cache/v/2.0.1?activeTab=dependencies) [to](https://www.npmjs.com/package/nx-remotecache-custom/v/4.0.0?activeTab=dependencies) [be](https://www.npmjs.com/package/nx-cloud/v/16.0.5?activeTab=dependencies) using the npm tar package to tar/untar archives using Node.js. While this increases portability, I came to realize that this can be 12x slower than using system calls to GNU tar, and performance can be massively be improved by compressing using `pigz` - a multithreaded `gzip` alternative.
 
 At the same time, most packages don't seem to be using the [best practices](https://docs.aws.amazon.com/AmazonS3/latest/userguide/example_s3_Scenario_UsingLargeFiles_section.html) for fetching large files from S3 using the AWS SDK resulting in slower uploads and downloads.
 
